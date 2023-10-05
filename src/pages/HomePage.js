@@ -9,15 +9,16 @@ import {
   Paper,
 } from "@mui/material";
 import { TextField } from "@mui/material";
+import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Typography } from "@mui/material";
 
 const HomePage = () => {
   const [data, setData] = useState([]);
-  const [input, setInput] = useState("");
+  // const [input, setInput] = useState("");
   const [draggedItems, setDraggedItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -120,11 +121,11 @@ const HomePage = () => {
     navigate("/login");
     localStorage.setItem("LoggedIn", "false");
   }
-  const filteredData = input
-    ? data.filter((value) =>
-        value.title.toLowerCase().includes(input.toLowerCase())
-      )
-    : data;
+  // const filteredData = input
+  //   ? data.filter((value) =>
+  //       value.title.toLowerCase().includes(input.toLowerCase())
+  //     )
+  //   : data;
 
   function handleClick(item) {
     const dblClick = data.map((value) => {
@@ -141,17 +142,52 @@ const HomePage = () => {
     dispatch({ type: "DROP", payload: null });
   }
 
+  function handleInputChange(event, value) {
+    console.log(value);
+  }
+
   return (
     <Box>
       <Box sx={{ display: "flex", justifyContent: "space-around" }}>
         <Typography variant="h5">API ANIME </Typography>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <TextField
+          {/* <TextField
             id="outlined-basic"
             label="Search"
             variant="outlined"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+          /> */}
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            options={data}
+            getOptionLabel={(option) => option.title}
+            onInputChange={handleInputChange}
+            sx={{ width: 300 }}
+            renderOption={(props, option) => (
+              <Link
+                to={`/home/${option.mal_id}`}
+                style={{ textDecoration: "none"}}
+              >
+                <Box
+                  component="li"
+                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                  {...props}
+                >
+                  <img
+                    loading="lazy"
+                    width="20"
+                    src={option.images.jpg.image_url}
+                    alt=""
+                  />
+                  <Button variant="text" sx={{ color: "black",textAlign:'start' }}>
+                    (Id : {option.mal_id}){option.title}
+                  </Button>
+                </Box>
+              </Link>
+            )}
+            renderInput={(params) => <TextField {...params} label="Anime" />}
           />
           <Button variant="contained" onClick={logoutBtn} sx={{ height: 50 }}>
             Logout
@@ -166,7 +202,7 @@ const HomePage = () => {
       ) : (
         <Box sx={{ display: "flex" }}>
           <Grid container spacing={3} sx={{ width: 400 }} xs={6}>
-            {filteredData.map((value, index) => {
+            {data.map((value, index) => {
               return (
                 <Grid item xs={6} key={index}>
                   <Card

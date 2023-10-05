@@ -7,21 +7,23 @@ import HomePage from './pages/HomePage';
 import Protect from './Protect';
 import ErrorPage from './pages/ErrorPage';
 import { Box } from '@mui/material';
+import  Details  from './pages/Details';
 
 function App() {
   return (
-      <Box className="App">
-        <Router>
-          <Routes>
-            <Route path='/' element={<RegisterPage />} />
-            <Route path='/login' element={<LoginPage />} />
-            <Route path='/home' element={<Protect />}>
-              <Route index element={<HomePage />} />
-            </Route>
-            <Route path="*" element={<ErrorPage />} />
-          </Routes>
-        </Router>
-      </Box>
+    <Box className="App">
+      <Router>
+        <Routes>
+          <Route path="/" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/home" element={<Protect />}>
+            <Route index element={<HomePage />} />
+          </Route>
+          <Route path="/home/:mal_id" element={<Details />} />
+          <Route path="*" element={<ErrorPage />} />
+        </Routes>
+      </Router>
+    </Box>
   );
 }
 

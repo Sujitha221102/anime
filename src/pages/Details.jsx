@@ -1,79 +1,124 @@
-import { Box, Button, Card, CardMedia, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardMedia,
+  CircularProgress,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Details = () => {
   const { mal_id } = useParams();
-  const Navigate=useNavigate()
+  const Navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [errPg, setErrPg] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   function fetchData() {
     axios
       .get(`https://api.jikan.moe/v4/anime/${mal_id}`)
       .then((response) => {
         setData(response.data.data);
+        setIsLoading(false);
+        setErrPg(false)
         console.log(response.data.data);
       })
       .catch((error) => {
+        setData(error.message)
+        setErrPg(true)
         console.error(error.message);
+        setIsLoading(false);
       });
   }
   useEffect(() => {
     fetchData();
   }, [mal_id]);
 
-
-  function handleBack(){
-    Navigate('/home')
+  function handleBack() {
+    Navigate("/home");
   }
   return (
-    <Card sx={{ textAlign: "start", m: 2, backgroundColor: "#bedbfa" }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-around",
-          width: "650",
-          height: "fit-content",
-          m: 2,
-        }}
-      >
-        <Box>
-          {<CardMedia
-              component="img"
-              sx={{ width: 450, height: 550 }}
-              image={data.images?.jpg?.image_url}
-              alt={data.title}
-            />}
-          <Button
-            variant="contained"
-            onClick={handleBack}
-            sx={{ mx: 20, my: 5 }}
-          >
-            Prev
-          </Button>
+    <Box>
+      {isLoading ? (
+        <Box sx={{ display: "flex", ml: 68 }}>
+          <CircularProgress />
+          <Button variant="text">LOADING..</Button>
         </Box>
-        <Box
-          sx={{
-            width: "550px",
-            height: "fit-content",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "start",
-          }}
-        >
-          <Typography variant="h4">TITLE : {data.title}</Typography>
-          <Typography>EPISODES : {data.episodes}</Typography>
-          <Typography>MAL_ID : {data.mal_id}</Typography>
-          <Typography>STATUS : {data.status}</Typography>
-          <Typography>DURATION : {data.duration}</Typography>
-          <Typography>SYNOPSIS : {data.synopsis}</Typography>
-          <Typography>
-            BACKGROUND : {data.background ? data.background : "Null"}
-          </Typography>
-        </Box>
-      </Box>
-    </Card>
+      ) : (
+        <>
+          {errPg ? (
+            <Typography variant="h5">{data}</Typography>
+          ) : (
+            <Card
+              sx={{
+                textAlign: "start",
+                m: 2,
+                width: 1180,
+                height: 570,
+                backgroundColor: "#bedbfa",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-around",
+                  m: 2,
+                }}
+              >
+                <Box>
+                  {
+                    <CardMedia
+                      component="img"
+                      sx={{ width: 450, height: 480 }}
+                      image={data.images?.jpg?.image_url}
+                      alt={data.title}
+                    />
+                  }
+                  <Button
+                    variant="contained"
+                    onClick={handleBack}
+                    sx={{ mx: 20, my: 1 }}
+                  >
+                    Prev
+                  </Button>
+                </Box>
+                <Box
+                  sx={{
+                    width: "450px",
+                    height: "500px",
+                    overflowY: "scroll",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                  }}
+                >
+                  <Typography variant="h4" sx={{ fontFamily: "fantasy" }}>
+                    TITLE : {data.title}
+                  </Typography>
+                  <Typography>EPISODES : {data.episodes}</Typography>
+                  <Typography>MAL_ID : {data.mal_id}</Typography>
+                  <Typography>STATUS : {data.status}</Typography>
+                  <Typography>DURATION : {data.duration}</Typography>
+                  <Typography>FAVOURITE : {data.favorites}</Typography>
+                  <Typography>RANK : {data.rank}</Typography>
+                  <Typography sx={{ fontSize: 14 }}>
+                    SYNOPSIS :{" "}
+                    {data.synopsis ? data.synopsis : "No Data available"}
+                  </Typography>
+                  <Typography sx={{ fontSize: 14 }}>
+                    BACKGROUND :{" "}
+                    {data.background ? data.background : "No Data available"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Card>
+          )}
+        </>
+      )}
+    </Box>
   );
 };
 

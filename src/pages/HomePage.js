@@ -1,27 +1,18 @@
 import axios from "axios";
 import React, { useEffect, useState, useReducer } from "react";
-import {
-  Box,
-  Card,
-  CardMedia,
-  CircularProgress,
-  Grid,
-  Paper,
-} from "@mui/material";
-import { TextField } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
+import { Box, CircularProgress, Grid } from "@mui/material";
 import Button from "@mui/material/Button";
-import { Link, useNavigate } from "react-router-dom";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import { Typography } from "@mui/material";
+import ApiData from "./ApiCards";
+import WishList from "./WishList";
+import NavBar from "./NavBar";
 
 const HomePage = () => {
   const [data, setData] = useState([]);
-  // const [input, setInput] = useState("");
+  const [input, setInput] = useState("");
   const [draggedItems, setDraggedItems] = useState([]);
+  const [errPg, setErrPg] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   function fetchData() {
     axios
@@ -29,8 +20,11 @@ const HomePage = () => {
       .then((response) => {
         setData(response.data.data);
         setIsLoading(false);
+        setErrPg(false);
       })
       .catch((error) => {
+        setErrPg(true);
+        setData(error.message);
         console.error(error.message);
         setIsLoading(false);
       });
@@ -117,164 +111,94 @@ const HomePage = () => {
     dispatch({ type: "DELETE" });
   };
 
-  function logoutBtn() {
-    navigate("/login");
-    localStorage.setItem("LoggedIn", "false");
-  }
-  // const filteredData = input
-  //   ? data.filter((value) =>
-  //       value.title.toLowerCase().includes(input.toLowerCase())
-  //     )
-  //   : data;
+  const filteredData = input
+    ? data.filter((value) =>
+        value.title.toLowerCase().includes(input.toLowerCase())
+      )
+    : data;
 
   function handleClick(item) {
-    const dblClick = data.map((value) => {
-      if (value.mal_id === item.mal_id) {
-        return {
-          ...value,
-          isEmoji: true,
-        };
-      }
-      return value;
-    });
-    setData(dblClick);
-    setDraggedItems([...draggedItems, item]);
-    dispatch({ type: "DROP", payload: null });
+    const itemWishList = draggedItems.some(
+      (draggedItem) => draggedItem.mal_id === item.mal_id
+    );
+    if (!itemWishList) {
+      const dblClick = data.map((value) => {
+        if (value.mal_id === item.mal_id) {
+          return {
+            ...value,
+            isEmoji: true,
+          };
+        }
+        return value;
+      });
+      setData(dblClick);
+      setDraggedItems([...draggedItems, item]);
+      dispatch({ type: "DROP", payload: null });
+    } else {
+      const dblClick = data.map((value) => {
+        if (value.mal_id === item.mal_id) {
+          return {
+            ...value,
+            isEmoji: false,
+          };
+        }
+        return value;
+      });
+      setData(dblClick);
+      const updatedDraggedItems = draggedItems.filter(
+        (draggedItem) => draggedItem.mal_id !== item.mal_id
+      );
+      setDraggedItems(updatedDraggedItems);
+      dispatch({ type: "DELETE" });
+    }
   }
 
-  function handleInputChange(event, value) {
-    console.log(value);
-  }
-
+  // function handleData(e, value) {
+  //   e.stopPropagation();
+  //   navigate(`/home/${value.mal_id}`);
+  // }
   return (
-    <Box>
-      <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-        <Typography variant="h5">API ANIME </Typography>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* <TextField
-            id="outlined-basic"
-            label="Search"
-            variant="outlined"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          /> */}
-          <Autocomplete
-            disablePortal
-            id="combo-box-demo"
-            options={data}
-            getOptionLabel={(option) => option.title}
-            onInputChange={handleInputChange}
-            sx={{ width: 300 }}
-            renderOption={(props, option) => (
-              <Link
-                to={`/home/${option.mal_id}`}
-                style={{ textDecoration: "none"}}
-              >
-                <Box
-                  component="li"
-                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                  {...props}
-                >
-                  <img
-                    loading="lazy"
-                    width="20"
-                    src={option.images.jpg.image_url}
-                    alt=""
-                  />
-                  <Button variant="text" sx={{ color: "black",textAlign:'start' }}>
-                    (Id : {option.mal_id}){option.title}
-                  </Button>
-                </Box>
-              </Link>
-            )}
-            renderInput={(params) => <TextField {...params} label="Anime" />}
-          />
-          <Button variant="contained" onClick={logoutBtn} sx={{ height: 50 }}>
-            Logout
-          </Button>
-        </Box>
-      </Box>
-      {isLoading ? (
-        <Box sx={{ display: "flex", ml: 68 }}>
-          <CircularProgress />
-          <Button variant="text">LOADING..</Button>
-        </Box>
+    <>
+      {errPg ? (
+        <Typography variant="h5">{data}</Typography>
       ) : (
-        <Box sx={{ display: "flex" }}>
-          <Grid container spacing={3} sx={{ width: 400 }} xs={6}>
-            {data.map((value, index) => {
-              return (
-                <Grid item xs={6} key={index}>
-                  <Card
-                    sx={{ m: 1, maxWidth: 345, height: 180 }}
-                    draggable
-                    onDragStart={() => handleDragStart(value)}
-                    onDragEnd={() => handleDragEnd()}
-                  >
-                    <CardMedia
-                      sx={{ height: 100, width: 220, m: 2 }}
-                      image={value.images.jpg.image_url}
-                    />
-                    <Typography
-                      sx={{ display: "flex", justifyContent: "space-around" }}
-                    >
-                      {value.title}
-                      {value.isEmoji ? (
-                        <FavoriteIcon sx={{ color: "red" }} />
-                      ) : (
-                        <FavoriteBorderIcon
-                          onDoubleClick={() => handleClick(value)}
-                        />
-                      )}
-                    </Typography>
-                  </Card>
-                </Grid>
-              );
-            })}
-          </Grid>
-          <Grid item xs={6}>
-            <Paper
-              elevation={3}
-              sx={{
-                m: 1,
-                p: 2,
-                width: 545,
-                height: 1900,
-              }}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={() => handleDrop()}
-            >
-              <Typography>WISHLIST❤️</Typography>
-              {draggedItems.map((item, index) => (
-                <Card
-                  key={index}
-                  sx={{
-                    m: 1,
-                    p: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
+        <Box>
+          <NavBar input={input} setInput={setInput} />
+          {isLoading ? (
+            <Box sx={{ display: "flex", ml: 68 }}>
+              <CircularProgress />
+              <Button variant="text">LOADING..</Button>
+            </Box>
+          ) : (
+            <>
+              <Box sx={{ display: "flex" }}>
+                <Grid
+                  container
+                  spacing={2}
+                  sx={{ width: 600, height: 1000, overflowY: "scroll", m: 1 }}
                 >
-                  <CardMedia
-                    sx={{ height: 100, width: 140, m: 2 }}
-                    image={item.images.jpg.image_url}
+                  <ApiData
+                    data={filteredData}
+                    setData={setData}
+                    // handleData={handleData}
+                    handleClick={handleClick}
+                    handleDragStart={handleDragStart}
+                    handleDragEnd={handleDragEnd}
                   />
-                  <Typography>{item.title}</Typography>
-                  <Button
-                    variant="contained"
-                    sx={{ height: 50 }}
-                    onClick={() => handleDelete(item)}
-                  >
-                    Delete
-                  </Button>
-                </Card>
-              ))}
-            </Paper>
-          </Grid>
+                </Grid>
+                <Grid item xs={6}>
+                  <WishList
+                    draggedItems={draggedItems}
+                    handleDrop={handleDrop}
+                    handleDelete={handleDelete}
+                  />
+                </Grid>
+              </Box>
+            </>
+          )}
         </Box>
       )}
-    </Box>
+    </>
   );
 };
 

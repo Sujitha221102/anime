@@ -93,17 +93,23 @@ const LoginPage = () => {
       <Button variant="contained" onClick={logined} disabled={errors.pass}>
         Submit
       </Button>
-      <Snackbar open={success} autoHideDuration={6000} onClose={handleClose}>
+      <MyAlert
+        open={success}
+        onClose={handleClose}
+        severity="success"
+        msg="You have Successfully LoggedIn"
+      />
+      {/* <Snackbar open={success} autoHideDuration={2000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
           You have Successfully LoggedIn
         </Alert>
-      </Snackbar>
-      <Snackbar open={warn} autoHideDuration={6000} onClose={handleClose}>
+      </Snackbar> */}
+      <Snackbar open={warn} autoHideDuration={2000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="warning" sx={{ width: "100%" }}>
           No Field Can be Empty
         </Alert>
       </Snackbar>
-      <Snackbar open={error} autoHideDuration={6000} onClose={handleClose}>
+      <Snackbar open={error} autoHideDuration={2000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
           email or password is Invalid
         </Alert>
@@ -119,3 +125,14 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+
+function MyAlert({open,onClose,msg,severity}){
+  return (
+    <Snackbar open={open} autoHideDuration={2000} onClose={onClose}>
+      <Alert onClose={onClose} severity={severity} sx={{ width: "100%" }}>
+        {msg}
+      </Alert>
+    </Snackbar>
+  );
+}

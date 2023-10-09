@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import { Typography } from "@mui/material";
 import ApiData from "./ApiCards";
 import WishList from "./WishList";
-import NavBar from "./NavBar";
+import NavBar from "./navbar/NavBar";
 
 const HomePage = () => {
   const [data, setData] = useState([]);

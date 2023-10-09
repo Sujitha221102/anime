@@ -12,17 +12,27 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
+const alertMsg = {
+  error: {
+    msg: "email or password is Invalid",
+    severity: "error",
+    key: "error",
+  },
+  warn: {
+    msg: "No Field Can be Empty",
+    severity: "warning",
+    key: "warn",
+  },
+  success: {
+    msg: "You have Successfully LoggedIn",
+    severity: "success",
+    key: "success",
+  },
+};
+
 const LoginPage = () => {
-  let data = [...JSON.parse(localStorage.getItem("data"))];
-  const [email, setEmail] = useState("");
-  const [pwd, setPwd] = useState("");
-  const [errors,setErrors]=useState({pass:false})
-  const [success, setSuccess] = useState(false);
-  const [warn, setWarn] = useState(false);
-  const [error, setError] = useState(false)
-
   const navigate = useNavigate();
-
+  let data = [...JSON.parse(localStorage.getItem("data"))];
 
   function logined() {
     let count = 0;
@@ -32,15 +42,15 @@ const LoginPage = () => {
       }
     }
     if (pwd === "" || email === "") {
-      setWarn(true)
-    }else if (count >= 1) {
-      setSuccess(true);
+      setErrorType(alertMsg.warn.key);
+    } else if (count >= 1) {
+      setErrorType(alertMsg.success.key);
       setTimeout(() => {
         navigate("/home");
       }, 2000);
       localStorage.setItem("LoggedIn", true);
-    }else{
-      setError(true)
+    } else {
+      setErrorType(alertMsg.error.key);
     }
   }
 
@@ -48,14 +58,18 @@ const LoginPage = () => {
     if (reason === "clickaway") {
       return;
     }
-    setSuccess(false);
-    setError(false);
-    setWarn(false);
+    setErrorType("");
   };
 
   function backtoRegister() {
     navigate("/");
   }
+
+  const [email, setEmail] = useState("");
+  const [pwd, setPwd] = useState("");
+  const [errors, setErrors] = useState({ pass: false });
+  const [errorType, setErrorType] = useState("");
+
   return (
     <Box
       component="form"
@@ -94,26 +108,11 @@ const LoginPage = () => {
         Submit
       </Button>
       <MyAlert
-        open={success}
+        open={errorType}
         onClose={handleClose}
-        severity="success"
-        msg="You have Successfully LoggedIn"
+        msg={alertMsg[errorType]?.msg}
+        severity={alertMsg[errorType]?.severity}
       />
-      {/* <Snackbar open={success} autoHideDuration={2000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-          You have Successfully LoggedIn
-        </Alert>
-      </Snackbar> */}
-      <Snackbar open={warn} autoHideDuration={2000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="warning" sx={{ width: "100%" }}>
-          No Field Can be Empty
-        </Alert>
-      </Snackbar>
-      <Snackbar open={error} autoHideDuration={2000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
-          email or password is Invalid
-        </Alert>
-      </Snackbar>
       <Typography variant="h6">
         You haven't registered yet!Click register..
       </Typography>
@@ -126,8 +125,7 @@ const LoginPage = () => {
 
 export default LoginPage;
 
-
-function MyAlert({open,onClose,msg,severity}){
+function MyAlert({ open, onClose, msg, severity }) {
   return (
     <Snackbar open={open} autoHideDuration={2000} onClose={onClose}>
       <Alert onClose={onClose} severity={severity} sx={{ width: "100%" }}>

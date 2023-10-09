@@ -8,13 +8,13 @@ export const useAppContext = () => {
 
 export const AppProvider = ({ children }) => {
   const [email, setEmail] = useState('');
-  const [arr, setArr] = useState([]);
+  const [noOfUsers, setNoOfUsers] = useState([]);
 
    const contextValue = {
     email,
     setEmail,
-    arr,
-    setArr,
+    noOfUsers,
+    setNoOfUsers,
   };
 
   return (

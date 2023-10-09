@@ -23,6 +23,10 @@ const FetchedData = ({
   const [pagination, setPagination] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const handlePage = (event, value) => {
+    console.log(value);
+    setCurrentPage(value);
+  };
   useEffect(() => {
     axios
       .get(`https://api.jikan.moe/v4/anime?page=${currentPage}`)
@@ -41,10 +45,6 @@ const FetchedData = ({
     };
   }, [currentPage]);
 
-  const handlePage = (event, value) => {
-    console.log(value);
-    setCurrentPage(value);
-  };
   return (
     <>
       {data.map((value, index) => {

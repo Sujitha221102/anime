@@ -13,52 +13,66 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
+const alertMsg = {
+  error: {
+    msg: "email or password is Invalid",
+    severity: "error",
+    key: "error",
+  },
+  warn: {
+    msg: "No Field Can be Empty",
+    severity: "warning",
+    key: "warn",
+  },
+  success: {
+    msg: "You have Successfully LoggedIn",
+    severity: "success",
+    key: "success",
+  },
+};
+
+
 const RegisterPage = () => {
   
+  const navigate = useNavigate();
+
+    function saveBtn() {
+      if (password === "" || email === "") {
+        setErrorType(alertMsg.warn.key);
+      } else {
+        setNoOfUsers([...noOfUsers, data]);
+        localStorage.setItem(
+          "data",
+          JSON.stringify([
+            ...JSON.parse(localStorage.getItem("data") || "[]"),
+            { ...data },
+          ])
+        );
+        setErrorType(alertMsg.success.key);
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
+    }
+    function loginFn() {
+      navigate("/login");
+    }
+    const handleClose = (reason) => {
+      if (reason === "clickaway") {
+        return;
+      }
+    };
+    
   const [errors, setErrors] = useState({ pass: false });
   const [password, setPassword] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [warn,setWarn]=useState(false)
-  const navigate = useNavigate();
-  const {
-    email,
-    setEmail,
-    arr,
-    setArr,
-  } = useAppContext();
+  const [errorType, setErrorType] = useState("");
+  const { email, setEmail, noOfUsers, setNoOfUsers } = useAppContext();
   const data = {
     email: email,
     pwd: password,
   };
 
-  function saveBtn() {
-    if (password === "" || email === "") {
-      setWarn(true)
-    }else{
-      setArr([...arr, data]);
-      localStorage.setItem(
-        "data",
-        JSON.stringify([
-          ...JSON.parse(localStorage.getItem("data") || "[]"),
-          { ...data },
-        ])
-      );
-      setSuccess(true);
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-    }
-  }
-  function loginFn() {
-    navigate("/login");
-  }
-  const handleClose = (reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSuccess(false);
-      setWarn(false);
-  };
+
   return (
     <Box
       component="form"
@@ -99,16 +113,12 @@ const RegisterPage = () => {
       <Button variant="contained" onClick={saveBtn} disabled={errors.pass}>
         Save
       </Button>
-      <Snackbar open={success} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-          You have successfully Registered
-        </Alert>
-      </Snackbar>
-      <Snackbar open={warn} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="warning" sx={{ width: "100%" }}>
-          No Field Can be Empty
-        </Alert>
-      </Snackbar>
+      <MyAlert
+        open={errorType}
+        onClose={handleClose}
+        msg={alertMsg[errorType]?.msg}
+        severity={alertMsg[errorType]?.severity}
+      />
       <Typography variant="h6">
         If you have already Registered!Click Login..
       </Typography>
@@ -120,3 +130,15 @@ const RegisterPage = () => {
 };
 
 export default RegisterPage;
+
+
+
+function MyAlert({ open, onClose, msg, severity }) {
+  return (
+    <Snackbar open={open} autoHideDuration={2000} onClose={onClose}>
+      <Alert onClose={onClose} severity={severity} sx={{ width: "100%" }}>
+        {msg}
+      </Alert>
+    </Snackbar>
+  );
+}

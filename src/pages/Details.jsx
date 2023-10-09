@@ -4,6 +4,7 @@ import {
   Card,
   CardMedia,
   CircularProgress,
+  Skeleton,
   Typography,
 } from "@mui/material";
 import axios from "axios";
@@ -51,6 +52,15 @@ const Details = () => {
         <>
           {errPg ? (
             <Typography variant="h5">{data}</Typography>
+          ) : 
+          (
+            isLoading ? (
+            <Skeleton
+              variant="rectangular"
+              animation="wave"
+              width={150}
+              height={100}
+            />
           ) : (
             <Card
               sx={{
@@ -115,7 +125,7 @@ const Details = () => {
                 </Box>
               </Box>
             </Card>
-          )}
+          ))}
         </>
       )}
     </Box>

@@ -18,7 +18,7 @@ const NavBar = ({input,setInput}) => {
           .catch((error) => {
             console.error(error.message);
           });
-      }, 3000);
+      }, 2500);
       return () => {
         clearTimeout(timer);
         console.log("sdddsfx", input);

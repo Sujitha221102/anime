@@ -12,7 +12,6 @@ const NavBar = ({input,setInput}) => {
         axios
           .get(`https://api.jikan.moe/v4/anime?q=${input}`)
           .then((response) => {
-            console.log("sidjcw", input);
             setOption(response.data.data);
           })
           .catch((error) => {
@@ -31,7 +30,7 @@ const NavBar = ({input,setInput}) => {
       } 
         function logoutBtn() {
           navigate("/login");
-          localStorage.setItem("LoggedIn", "false");
+          localStorage.setItem("LoggedIn", false);
         }
 
   return (

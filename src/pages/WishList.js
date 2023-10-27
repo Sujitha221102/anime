@@ -1,5 +1,5 @@
 import { Button, Card, CardMedia, Paper, Typography } from '@mui/material';
-import React, { useState } from 'react'
+import React from 'react'
 
 const WishList = ({draggedItems,handleDelete,handleDrop}) => {
   return (

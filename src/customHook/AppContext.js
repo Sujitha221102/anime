@@ -7,12 +7,9 @@ export const useAppContext = () => {
 };
 
 export const AppProvider = ({ children }) => {
-  const [email, setEmail] = useState('');
   const [noOfUsers, setNoOfUsers] = useState([]);
 
    const contextValue = {
-    email,
-    setEmail,
     noOfUsers,
     setNoOfUsers,
   };

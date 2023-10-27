@@ -25,7 +25,7 @@ const alertMsg = {
     key: "warn",
   },
   success: {
-    msg: "You have Successfully LoggedIn",
+    msg: "You have Successfully Registered",
     severity: "success",
     key: "success",
   },
@@ -66,7 +66,8 @@ const RegisterPage = () => {
   const [errors, setErrors] = useState({ pass: false });
   const [password, setPassword] = useState("");
   const [errorType, setErrorType] = useState("");
-  const { email, setEmail, noOfUsers, setNoOfUsers } = useAppContext();
+  const [email,setEmail]=useState("")
+  const { noOfUsers, setNoOfUsers } = useAppContext();
   const data = {
     email: email,
     pwd: password,
@@ -80,7 +81,7 @@ const RegisterPage = () => {
         width: 280,
         height: 350,
         mx: 60,
-        my: 5,
+        my: 13,
         p: 2,
         backgroundColor: "white",
         "&:hover": { backgroundColor: "#c5d8fc" },
